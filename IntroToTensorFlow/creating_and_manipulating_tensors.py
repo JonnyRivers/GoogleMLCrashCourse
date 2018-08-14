@@ -129,3 +129,40 @@ print(c.numpy())
 # TensorFlow allows you to define Variable objects, whose values can be changed.
 # When creating a variable, you can set an initial value explicitly, or you can use an initializer (like a distribution):
 
+# Create a scalar variable with the initial value 3.
+v = tf.contrib.eager.Variable([3])
+
+# Create a vector variable of shape [1, 4], with random initial values,
+# sampled from a normal distribution with mean 1 and standard deviation 0.35.
+w = tf.contrib.eager.Variable(tf.random_normal([1, 4], mean=1.0, stddev=0.35))
+
+print("v:", v.numpy())
+print("w:", w.numpy())
+
+# To change the value of a variable, use the assign op:
+
+v = tf.contrib.eager.Variable([3])
+print(v.numpy())
+
+tf.assign(v, [7])
+print(v.numpy())
+
+v.assign([5])
+print(v.numpy())
+
+# When assigning a new value to a variable, its shape must be equal to its previous shape:
+v = tf.contrib.eager.Variable([[1, 2, 3], [4, 5, 6]])
+print(v.numpy())
+
+try:
+  print("Assigning [7, 8, 9] to v")
+  v.assign([7, 8, 9])
+except ValueError as e:
+  print("Exception:", e)
+
+# Exercise #3: Simulate 10 rolls of two dice.
+rolls1 = tf.random_uniform([10,1], dtype=tf.int32, minval=1, maxval=7)
+rolls2 = tf.random_uniform([10,1], dtype=tf.int32, minval=1, maxval=7)
+rolls_sum = tf.add(rolls1, rolls2)
+resulting_matrix = tf.concat([rolls1, rolls2, rolls_sum], 1)
+print(resulting_matrix.numpy())
