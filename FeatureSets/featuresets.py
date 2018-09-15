@@ -92,11 +92,6 @@ display.display(training_targets.describe())
 print("Validation targets summary:")
 display.display(validation_targets.describe())
 
-correlation_dataframe = training_examples.copy()
-correlation_dataframe["target"] = training_targets["median_house_value"]
-
-print(correlation_dataframe.corr())
-
 def construct_feature_columns(input_features):
   """Construct the TensorFlow Feature Columns.
 
@@ -239,16 +234,17 @@ def train_model(
 #
 minimal_features = [
     "median_income",
-    "lat_32_to_33",
-    "lat_33_to_34",
-    "lat_34_to_35",
-    "lat_35_to_36",
+    "rooms_per_person",
+    #"lat_32_to_33",
+    #"lat_33_to_34",
+    #"lat_34_to_35",
+    #"lat_35_to_36",
     "lat_36_to_37",
     "lat_37_to_38",
-    "lat_38_to_39",
+    #"lat_38_to_39",
     "lat_39_to_40",
-    "lat_40_to_41",
-    "lat_41_to_42"
+    #"lat_40_to_41",
+    #"lat_41_to_42"
 ]
 
 assert minimal_features, "You must select at least one feature!"
@@ -256,11 +252,16 @@ assert minimal_features, "You must select at least one feature!"
 minimal_training_examples = training_examples[minimal_features]
 minimal_validation_examples = validation_examples[minimal_features]
 
+correlation_dataframe = minimal_training_examples.copy()
+correlation_dataframe["target"] = training_targets["median_house_value"]
+
+print(correlation_dataframe.corr())
+
 #
 # Don't forget to adjust these parameters.
 #
 train_model(
-    learning_rate=0.1,
+    learning_rate=0.05,
     steps=500,
     batch_size=5,
     training_examples=minimal_training_examples,
