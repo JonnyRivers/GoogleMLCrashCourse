@@ -81,16 +81,59 @@ display.display(training_targets.describe())
 print("Validation targets summary:")
 display.display(validation_targets.describe())
 
-def construct_feature_columns(input_features):
+def get_quantile_based_boundaries(feature_values, num_buckets):
+  boundaries = np.arange(1.0, num_buckets) / num_buckets
+  quantiles = feature_values.quantile(boundaries)
+  return [quantiles[q] for q in quantiles.keys()]
+
+def construct_feature_columns():
   """Construct the TensorFlow Feature Columns.
 
-  Args:
-    input_features: The names of the numerical input features to use.
   Returns:
     A set of feature columns
-  """
-  return set([tf.feature_column.numeric_column(my_feature)
-              for my_feature in input_features])
+  """ 
+  households = tf.feature_column.numeric_column("households")
+  longitude = tf.feature_column.numeric_column("longitude")
+  latitude = tf.feature_column.numeric_column("latitude")
+  housing_median_age = tf.feature_column.numeric_column("housing_median_age")
+  median_income = tf.feature_column.numeric_column("median_income")
+  rooms_per_person = tf.feature_column.numeric_column("rooms_per_person")
+  
+  # Divide households into 7 buckets.
+  bucketized_households = tf.feature_column.bucketized_column(
+    households, boundaries=get_quantile_based_boundaries(
+      training_examples["households"], 7))
+
+  # Divide longitude into 10 buckets.
+  bucketized_longitude = tf.feature_column.bucketized_column(
+    longitude, boundaries=get_quantile_based_boundaries(
+      training_examples["longitude"], 10))
+
+  bucketized_latitude = tf.feature_column.bucketized_column(
+    latitude, boundaries=get_quantile_based_boundaries(
+      training_examples["latitude"], 10))
+
+  bucketized_housing_median_age = tf.feature_column.bucketized_column(
+    housing_median_age, boundaries=get_quantile_based_boundaries(
+      training_examples["housing_median_age"], 7))
+
+  bucketized_median_income = tf.feature_column.bucketized_column(
+    median_income, boundaries=get_quantile_based_boundaries(
+      training_examples["median_income"], 7))
+
+  bucketized_rooms_per_person = tf.feature_column.bucketized_column(
+    rooms_per_person, boundaries=get_quantile_based_boundaries(
+      training_examples["rooms_per_person"], 7))
+  
+  feature_columns = set([
+    bucketized_longitude,
+    bucketized_latitude,
+    bucketized_housing_median_age,
+    bucketized_households,
+    bucketized_median_income,
+    bucketized_rooms_per_person])
+  
+  return feature_columns
 
 def my_input_fn(features, targets, batch_size=1, shuffle=True, num_epochs=None):
     """Trains a linear regression model.
@@ -218,10 +261,10 @@ def train_model(
   return linear_regressor
 
 train_model(
-    learning_rate=1.0,
+    learning_rate=1.5,
     steps=500,
     batch_size=100,
-    feature_columns=construct_feature_columns(training_examples),
+    feature_columns=construct_feature_columns(),
     training_examples=training_examples,
     training_targets=training_targets,
     validation_examples=validation_examples,
