@@ -340,3 +340,5 @@ evaluation_metrics = linear_classifier.evaluate(input_fn=predict_validation_inpu
 
 print("AUC on the validation set: %0.2f" % evaluation_metrics['auc'])
 print("Accuracy on the validation set: %0.2f" % evaluation_metrics['accuracy'])
+
+plt.show()
