@@ -183,9 +183,9 @@ def train_model(dataframe, learning_rate, steps, batch_size, input_feature, targ
 
 train_model(
     aapl_hist_closing_df,
-    learning_rate=0.00002,
+    learning_rate=0.00005,
     steps=1000,
-    batch_size=5,
+    batch_size=20,
     input_feature="days_from_start",
     target_label="price"
 )
